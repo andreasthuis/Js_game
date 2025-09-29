@@ -8,6 +8,11 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  const loader = new THREE.OBJLoader()
+  loader.load('/workspaces/Js_game/Car.obj', (object) => {
+    scene.add(object)
+  })
+
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(5, 10, 7);
   scene.add(light);

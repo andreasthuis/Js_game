@@ -1,4 +1,11 @@
+import * as THREE from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+ 
+ // Test: status-overlay direct vullen
+  const statusDiv = document.getElementById('status');
+  if (statusDiv) statusDiv.textContent = 'game.js is gestart';
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
 
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
   camera.position.z = 7;
@@ -7,11 +14,37 @@
   const renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+  function showStatus(msg) {
+    const statusDiv = document.getElementById('status');
+    if (statusDiv) statusDiv.textContent = msg;
+  }
 
-  const loader = new THREE.OBJLoader();
-  loader.load('Car.obj', (object) => {
-    scene.add(object);
-  });
+  console.log('Three.js game start');
+  showStatus('Three.js game start');
+
+  // Check of OBJLoader bestaat
+  if (typeof THREE.OBJLoader === 'undefined') {
+    showStatus('OBJLoader is niet geladen! Controleer je script-tag in index.html.');
+  }
+
+  const loader = new OBJLoader();
+  loader.load(
+    'Car.obj',
+    (object) => {
+      scene.add(object);
+      showStatus('Car.obj succesvol geladen');
+    },
+    undefined,
+    (error) => {
+      showStatus('Fout bij laden van Car.obj. Fallback auto toegevoegd.');
+      // Fallback: voeg een rode kubus toe
+      const fallbackGeometry = new THREE.BoxGeometry(1, 1, 2);
+      const fallbackMaterial = new THREE.MeshStandardMaterial({color: 0xff0000});
+      const fallbackCar = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+      fallbackCar.position.set(0, 0.5, 0);
+      scene.add(fallbackCar);
+    }
+  );
 
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(5, 10, 7);
